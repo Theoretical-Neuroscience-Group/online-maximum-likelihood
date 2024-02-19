@@ -60,25 +60,25 @@ function path(T,dt,par,decpar,rates)
 	#Euler-Maruyama integration of stochastic variables
 	for t = 2:N
 		# state and observation
-		X[t] = b*dW[t] + X[-1 + t] - a*dt*X[-1 + t]
-		dY[t]= dV[t] + dt*w*X[-1 + t]
+		X[t] = b*dW[t] + X[t-1] - a*dt*X[t-1]
+		dY[t]= dV[t] + dt*w*X[t-1]
 
 		# filter
-		mu[t] = mu[-1 + t] - dt*af[-1 + t]*mu[-1 + t] + dY[t]*P[-1 + t]*wf[-1 + t] - dt*mu[-1 + t]*P[-1 + t]*wf[-1 + t]^2
-		P[t] = dt*bf[-1 + t]^2 + P[-1 + t] - 2*dt*af[-1 + t]*P[-1 + t] - dt*P[-1 + t]^2*wf[-1 + t]^2
+		mu[t] = mu[t-1] - dt*af[t-1]*mu[t-1] + dY[t]*P[t-1]*wf[t-1] - dt*mu[t-1]*P[t-1]*wf[t-1]^2
+		P[t] = dt*bf[t-1]^2 + P[t-1] - 2*dt*af[t-1]*P[t-1] - dt*P[t-1]^2*wf[t-1]^2
 
 		# filter derivatives
-		mua[t] = dY[t]*Pa[-1 + t]*wf[-1 + t] - mua[-1 + t]*(-1 + dt*af[-1 + t] + dt*P[-1 + t]*wf[-1 + t]^2) - mu[-1 + t]*(dt + dt*Pa[-1 + t]*wf[-1 + t]^2)
-		mub[t] = Pb[-1 + t]*wf[-1 + t]*(dY[t] - dt*mu[-1 + t]*wf[-1 + t]) - mub[-1 + t]*(-1 + dt*af[-1 + t] + dt*P[-1 + t]*wf[-1 + t]^2)
-		muw[t] = dY[t]*P[-1 + t] - muw[-1 + t]*(-1 + dt*af[-1 + t] + dt*P[-1 + t]*wf[-1 + t]^2) + wf[-1 + t]*(dY[t]*Pw[-1 + t] - dt*mu[-1 + t]*(2*P[-1 + t] + Pw[-1 + t]*wf[-1 + t]))
-		Pa[t] = (1 - 2*dt*af[-1 + t])*Pa[-1 + t] - 2*P[-1 + t]*(dt + dt*Pa[-1 + t]*wf[-1 + t]^2)
-		Pb[t] = 2*dt*bf[-1 + t] + Pb[-1 + t]*(1 - 2*dt*(af[-1 + t] + P[-1 + t]*wf[-1 + t]^2))
-		Pw[t] = -2*dt*P[-1 + t]^2*wf[-1 + t] + Pw[-1 + t]*(1 - 2*dt*(af[-1 + t] + P[-1 + t]*wf[-1 + t]^2))
+		mua[t] = dY[t]*Pa[t-1]*wf[t-1] - mua[t-1]*(-1 + dt*af[t-1] + dt*P[t-1]*wf[t-1]^2) - mu[t-1]*(dt + dt*Pa[t-1]*wf[t-1]^2)
+		mub[t] = Pb[t-1]*wf[t-1]*(dY[t] - dt*mu[t-1]*wf[t-1]) - mub[t-1]*(-1 + dt*af[t-1] + dt*P[t-1]*wf[t-1]^2)
+		muw[t] = dY[t]*P[t-1] - muw[t-1]*(-1 + dt*af[t-1] + dt*P[t-1]*wf[t-1]^2) + wf[t-1]*(dY[t]*Pw[t-1] - dt*mu[t-1]*(2*P[t-1] + Pw[t-1]*wf[t-1]))
+		Pa[t] = (1 - 2*dt*af[t-1])*Pa[t-1] - 2*P[t-1]*(dt + dt*Pa[t-1]*wf[t-1]^2)
+		Pb[t] = 2*dt*bf[t-1] + Pb[t-1]*(1 - 2*dt*(af[t-1] + P[t-1]*wf[t-1]^2))
+		Pw[t] = -2*dt*P[t-1]^2*wf[t-1] + Pw[t-1]*(1 - 2*dt*(af[t-1] + P[t-1]*wf[t-1]^2))
 
 		# parameter estimates
-		af[t] = af[t-1]+eta_a*af[t-1]*(mua[-1 + t]*wf[-1 + t])*(dY[t]-(mu[-1 + t]*wf[-1 + t])dt)
-		bf[t] = bf[t-1]+eta_b*bf[t-1]*(mub[-1 + t]*wf[-1 + t])*(dY[t]-(mu[-1 + t]*wf[-1 + t])dt)
-		wf[t] = wf[t-1]+eta_w*wf[t-1]*(mu[-1 + t] + muw[-1 + t]*wf[-1 + t])*(dY[t]-(mu[-1 + t]*wf[-1 + t])dt)
+		af[t] = af[t-1]+eta_a*af[t-1]*(mua[t-1]*wf[t-1])*(dY[t]-(mu[t-1]*wf[t-1])dt)
+		bf[t] = bf[t-1]+eta_b*bf[t-1]*(mub[t-1]*wf[t-1])*(dY[t]-(mu[t-1]*wf[t-1])dt)
+		wf[t] = wf[t-1]+eta_w*wf[t-1]*(mu[t-1] + muw[t-1]*wf[t-1])*(dY[t]-(mu[t-1]*wf[t-1])dt)
 
 		# mean-squared error
 		mse[t]=(X[t]-mu[t])^2

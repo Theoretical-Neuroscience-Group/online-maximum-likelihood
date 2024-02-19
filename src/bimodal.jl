@@ -67,28 +67,28 @@ function path(T,dt,par,decpar,rates)
 	# Euler-Maruyama integration of stochastic variables
 	for t = 2:N
 		# state and observation
-		X[t] = c*dW[t] + X[-1 + t] + dt*X[-1 + t]*(a - b*X[-1 + t]^2)
-		dY[t]= dV[t] + dt*w*X[-1 + t]
+		X[t] = c*dW[t] + X[t-1] + dt*X[t-1]*(a - b*X[t-1]^2)
+		dY[t]= dV[t] + dt*w*X[t-1]
 
 		# filter
-		mu[t] = mu[-1 + t] + dt*af[-1 + t]*mu[-1 + t] - dt*bf[-1 + t]*mu[-1 + t]^3 - 3*dt*bf[-1 + t]*mu[-1 + t]*P[-1 + t] + dY[t]*P[-1 + t]*wf[-1 + t] - dt*mu[-1 + t]*P[-1 + t]*wf[-1 + t]^2
-		P[t] = dt*cf[-1 + t]^2 + P[-1 + t] + 2*dt*af[-1 + t]*P[-1 + t] - 6*dt*bf[-1 + t]*mu[-1 + t]^2*P[-1 + t] - 6*dt*bf[-1 + t]*P[-1 + t]^2 - dt*P[-1 + t]^2*wf[-1 + t]^2
+		mu[t] = mu[t-1] + dt*af[t-1]*mu[t-1] - dt*bf[t-1]*mu[t-1]^3 - 3*dt*bf[t-1]*mu[t-1]*P[t-1] + dY[t]*P[t-1]*wf[t-1] - dt*mu[t-1]*P[t-1]*wf[t-1]^2
+		P[t] = dt*cf[t-1]^2 + P[t-1] + 2*dt*af[t-1]*P[t-1] - 6*dt*bf[t-1]*mu[t-1]^2*P[t-1] - 6*dt*bf[t-1]*P[t-1]^2 - dt*P[t-1]^2*wf[t-1]^2
 
 		# filter derivatives
-		mua[t] = -3*dt*bf[-1 + t]*mu[-1 + t]^2*mua[-1 + t] + dY[t]*Pa[-1 + t]*wf[-1 + t] - dt*mu[-1 + t]*(-1 + Pa[-1 + t]*(3*bf[-1 + t] + wf[-1 + t]^2)) + mua[-1 + t]*(1 + dt*(af[-1 + t] - P[-1 + t]*(3*bf[-1 + t] + wf[-1 + t]^2)))
-		mub[t] = -(dt*mu[-1 + t]^3) - 3*dt*bf[-1 + t]*mu[-1 + t]^2*mub[-1 + t] + dY[t]*Pb[-1 + t]*wf[-1 + t] - dt*mu[-1 + t]*(3*P[-1 + t] + Pb[-1 + t]*(3*bf[-1 + t] + wf[-1 + t]^2)) + mub[-1 + t]*(1 + dt*(af[-1 + t] - P[-1 + t]*(3*bf[-1 + t] + wf[-1 + t]^2)))
-		muc[t] = Pc[-1 + t]*(dY[t]*wf[-1 + t] - dt*mu[-1 + t]*(3*bf[-1 + t] + wf[-1 + t]^2)) + muc[-1 + t]*(1 + dt*(af[-1 + t] - 3*bf[-1 + t]*(mu[-1 + t]^2 + P[-1 + t]) - P[-1 + t]*wf[-1 + t]^2))
-		muw[t] = dY[t]*(P[-1 + t] + Pw[-1 + t]*wf[-1 + t]) - dt*mu[-1 + t]*(2*P[-1 + t]*wf[-1 + t] + Pw[-1 + t]*(3*bf[-1 + t] + wf[-1 + t]^2)) + muw[-1 + t]*(1 + dt*(af[-1 + t] - 3*bf[-1 + t]*(mu[-1 + t]^2 + P[-1 + t]) - P[-1 + t]*wf[-1 + t]^2))
-		Pa[t] = (1 + 2*dt*af[-1 + t] - 6*dt*bf[-1 + t]*mu[-1 + t]^2)*Pa[-1 + t] - 2*dt*P[-1 + t]*(-1 + 6*bf[-1 + t]*(mu[-1 + t]*mua[-1 + t] + Pa[-1 + t]) + Pa[-1 + t]*wf[-1 + t]^2)
-		Pb[t] = Pb[-1 + t] - 2*dt*(3*P[-1 + t]*(mu[-1 + t]^2 + 2*bf[-1 + t]*mu[-1 + t]*mub[-1 + t] + P[-1 + t]) - af[-1 + t]*Pb[-1 + t] + 3*bf[-1 + t]*(mu[-1 + t]^2 + 2*P[-1 + t])*Pb[-1 + t] + P[-1 + t]*Pb[-1 + t]*wf[-1 + t]^2)
-		Pc[t] = 2*dt*cf[-1 + t] - 6*dt*bf[-1 + t]*(2*mu[-1 + t]*muc[-1 + t]*P[-1 + t] + (mu[-1 + t]^2 + 2*P[-1 + t])*Pc[-1 + t]) + Pc[-1 + t]*(1 + 2*dt*af[-1 + t] - 2*dt*P[-1 + t]*wf[-1 + t]^2)
-		Pw[t] = -6*dt*bf[-1 + t]*(2*mu[-1 + t]*muw[-1 + t]*P[-1 + t] + (mu[-1 + t]^2 + 2*P[-1 + t])*Pw[-1 + t]) - 2*dt*P[-1 + t]^2*wf[-1 + t] + Pw[-1 + t]*(1 + 2*dt*af[-1 + t] - 2*dt*P[-1 + t]*wf[-1 + t]^2)
+		mua[t] = -3*dt*bf[t-1]*mu[t-1]^2*mua[t-1] + dY[t]*Pa[t-1]*wf[t-1] - dt*mu[t-1]*(-1 + Pa[t-1]*(3*bf[t-1] + wf[t-1]^2)) + mua[t-1]*(1 + dt*(af[t-1] - P[t-1]*(3*bf[t-1] + wf[t-1]^2)))
+		mub[t] = -(dt*mu[t-1]^3) - 3*dt*bf[t-1]*mu[t-1]^2*mub[t-1] + dY[t]*Pb[t-1]*wf[t-1] - dt*mu[t-1]*(3*P[t-1] + Pb[t-1]*(3*bf[t-1] + wf[t-1]^2)) + mub[t-1]*(1 + dt*(af[t-1] - P[t-1]*(3*bf[t-1] + wf[t-1]^2)))
+		muc[t] = Pc[t-1]*(dY[t]*wf[t-1] - dt*mu[t-1]*(3*bf[t-1] + wf[t-1]^2)) + muc[t-1]*(1 + dt*(af[t-1] - 3*bf[t-1]*(mu[t-1]^2 + P[t-1]) - P[t-1]*wf[t-1]^2))
+		muw[t] = dY[t]*(P[t-1] + Pw[t-1]*wf[t-1]) - dt*mu[t-1]*(2*P[t-1]*wf[t-1] + Pw[t-1]*(3*bf[t-1] + wf[t-1]^2)) + muw[t-1]*(1 + dt*(af[t-1] - 3*bf[t-1]*(mu[t-1]^2 + P[t-1]) - P[t-1]*wf[t-1]^2))
+		Pa[t] = (1 + 2*dt*af[t-1] - 6*dt*bf[t-1]*mu[t-1]^2)*Pa[t-1] - 2*dt*P[t-1]*(-1 + 6*bf[t-1]*(mu[t-1]*mua[t-1] + Pa[t-1]) + Pa[t-1]*wf[t-1]^2)
+		Pb[t] = Pb[t-1] - 2*dt*(3*P[t-1]*(mu[t-1]^2 + 2*bf[t-1]*mu[t-1]*mub[t-1] + P[t-1]) - af[t-1]*Pb[t-1] + 3*bf[t-1]*(mu[t-1]^2 + 2*P[t-1])*Pb[t-1] + P[t-1]*Pb[t-1]*wf[t-1]^2)
+		Pc[t] = 2*dt*cf[t-1] - 6*dt*bf[t-1]*(2*mu[t-1]*muc[t-1]*P[t-1] + (mu[t-1]^2 + 2*P[t-1])*Pc[t-1]) + Pc[t-1]*(1 + 2*dt*af[t-1] - 2*dt*P[t-1]*wf[t-1]^2)
+		Pw[t] = -6*dt*bf[t-1]*(2*mu[t-1]*muw[t-1]*P[t-1] + (mu[t-1]^2 + 2*P[t-1])*Pw[t-1]) - 2*dt*P[t-1]^2*wf[t-1] + Pw[t-1]*(1 + 2*dt*af[t-1] - 2*dt*P[t-1]*wf[t-1]^2)
 
 		# parameter estimates
-		af[t] = af[t-1]+eta_a*af[t-1]*(mua[-1 + t]*wf[-1 + t])*(dY[t]-(mu[-1 + t]*wf[-1 + t])dt)
-		bf[t] = bf[t-1]+eta_b*bf[t-1]*(mub[-1 + t]*wf[-1 + t])*(dY[t]-(mu[-1 + t]*wf[-1 + t])dt)
-		cf[t] = cf[t-1]+eta_c*cf[t-1]*(muc[-1 + t]*wf[-1 + t])*(dY[t]-(mu[-1 + t]*wf[-1 + t])dt)
-		wf[t] = wf[t-1]+eta_w*wf[t-1]*(mu[-1 + t] + muw[-1 + t]*wf[-1 + t])*(dY[t]-(mu[-1 + t]*wf[-1 + t])dt)
+		af[t] = af[t-1]+eta_a*af[t-1]*(mua[t-1]*wf[t-1])*(dY[t]-(mu[t-1]*wf[t-1])dt)
+		bf[t] = bf[t-1]+eta_b*bf[t-1]*(mub[t-1]*wf[t-1])*(dY[t]-(mu[t-1]*wf[t-1])dt)
+		cf[t] = cf[t-1]+eta_c*cf[t-1]*(muc[t-1]*wf[t-1])*(dY[t]-(mu[t-1]*wf[t-1])dt)
+		wf[t] = wf[t-1]+eta_w*wf[t-1]*(mu[t-1] + muw[t-1]*wf[t-1])*(dY[t]-(mu[t-1]*wf[t-1])dt)
 
 		# mean-squared error
 		mse[t] = (X[t]-mu[t])^2
