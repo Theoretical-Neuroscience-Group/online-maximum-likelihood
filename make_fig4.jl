@@ -1,4 +1,3 @@
-cd("simulations_updated")
 include("src/bimodal.jl")
 using .bimodal
 

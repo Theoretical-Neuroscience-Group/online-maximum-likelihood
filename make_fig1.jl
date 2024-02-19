@@ -1,4 +1,3 @@
-cd("simulations_updated")
 include("src/kalmanbucy.jl")
 using .kalmanbucy
 
